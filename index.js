@@ -5,21 +5,43 @@ const app = express();
 // require graphql
 const {
   graphql,
+  GraphQLID,
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
 } = require('graphql');
 const graphqlHTTP = require('express-graphql');
 
+// require postgres
+const pg = require('pg');
+const pgpool = new pg.Pool({ database: 'graphql_postgres_express_demo' });
+
 // set up schema
+const postType = new GraphQLObjectType({
+  name: 'Post',
+  fields: {
+    id: {
+      type: GraphQLID
+    },
+    title: {
+      type: GraphQLString
+    },
+  }
+});
+
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'RootQuery',
     fields: {
-      hello: {
-        type: GraphQLString,
-        resolve: () => "world",
-      }
+      post: {
+        type: postType,
+        resolve: () => {
+          return pgpool.query(`
+            SELECT * FROM posts
+            WHERE id = 1
+          `, []).then((result) => result.rows[0]);
+        }
+      },
     },
   }),
 });
