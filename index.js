@@ -20,6 +20,21 @@ const pg = require('pg');
 const pgpool = new pg.Pool({ database: 'graphql_postgres_express_demo' });
 
 // set up schema
+const commentType = new GraphQLObjectType({
+  name: 'Comment',
+  fields: {
+    id: {
+      type: GraphQLID
+    },
+    post_id: {
+      type: GraphQLInt
+    },
+    text: {
+      type: GraphQLString
+    }
+  }
+});
+
 const postType = new GraphQLObjectType({
   name: 'Post',
   fields: {
@@ -28,6 +43,16 @@ const postType = new GraphQLObjectType({
     },
     title: {
       type: GraphQLString
+    },
+    comments: {
+      type: new GraphQLList(commentType),
+      resolve: (obj) => {
+        console.log(obj);
+        return pgpool.query(`
+          SELECT * FROM comments
+          WHERE post_id = $1
+        `, [obj.id]).then((result) => result.rows);
+      }
     },
   }
 });
