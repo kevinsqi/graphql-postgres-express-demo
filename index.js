@@ -6,6 +6,9 @@ const app = express();
 const {
   graphql,
   GraphQLID,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
@@ -35,11 +38,24 @@ const schema = new GraphQLSchema({
     fields: {
       post: {
         type: postType,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLInt)
+          }
+        },
+        resolve: (obj, args) => {
+          return pgpool.query(`
+            SELECT * FROM posts
+            WHERE id = $1
+          `, [args.id]).then((result) => result.rows[0]);
+        }
+      },
+      posts: {
+        type: new GraphQLList(postType),
         resolve: () => {
           return pgpool.query(`
             SELECT * FROM posts
-            WHERE id = 1
-          `, []).then((result) => result.rows[0]);
+          `, []).then((result) => result.rows);
         }
       },
     },
