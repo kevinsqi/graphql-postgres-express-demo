@@ -4,7 +4,6 @@ const app = express();
 
 // require graphql
 const {
-  graphql,
   GraphQLID,
   GraphQLInt,
   GraphQLList,
@@ -20,6 +19,18 @@ const pg = require('pg');
 const pgpool = new pg.Pool({ database: 'graphql_postgres_express_demo' });
 
 // set up schema
+const userType = new GraphQLObjectType({
+  name: 'User',
+  fields: {
+    id: {
+      type: GraphQLID
+    },
+    username: {
+      type: GraphQLString
+    },
+  }
+});
+
 const commentType = new GraphQLObjectType({
   name: 'Comment',
   fields: {
@@ -31,7 +42,16 @@ const commentType = new GraphQLObjectType({
     },
     text: {
       type: GraphQLString
-    }
+    },
+    user: {
+      type: userType,
+      resolve: (obj) => {
+        return pgpool.query(`
+          SELECT * FROM users
+          WHERE id = $1
+        `, [obj.user_id]).then((result) => result.rows[0]);
+      }
+    },
   }
 });
 
@@ -47,7 +67,6 @@ const postType = new GraphQLObjectType({
     comments: {
       type: new GraphQLList(commentType),
       resolve: (obj) => {
-        console.log(obj);
         return pgpool.query(`
           SELECT * FROM comments
           WHERE post_id = $1
