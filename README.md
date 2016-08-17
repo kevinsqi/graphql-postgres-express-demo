@@ -1,5 +1,7 @@
 # GraphQL Postgres Express demo
 
+A simple GraphQL server for a Postgres DB which has posts, comments, and users.
+
 ## Setup
 
 Install and use node 6 (if it's not already installed):
