@@ -66,11 +66,17 @@ const postType = new GraphQLObjectType({
     },
     comments: {
       type: new GraphQLList(commentType),
-      resolve: (obj) => {
+      args: {
+        limit: {
+          type: GraphQLInt
+        }
+      },
+      resolve: (obj, args) => {
         return pgpool.query(`
           SELECT * FROM comments
           WHERE post_id = $1
-        `, [obj.id]).then((result) => result.rows);
+          LIMIT $2
+        `, [obj.id, args.limit]).then((result) => result.rows);
       }
     },
   }
