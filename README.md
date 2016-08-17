@@ -9,7 +9,14 @@ nvm install 6
 nvm use 6
 ```
 
-Set up the database:
+Install packages:
+
+```
+npm install
+```
+
+
+Set up the database (requires postgres to be installed):
 
 ```
 psql -f setup_database.sql
