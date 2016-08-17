@@ -28,4 +28,4 @@ psql -f setup_database.sql
 npm run start
 ```
 
-Then, go to [localhost:3000/graphql](http://localhost:3000/graphql).
+Then, go to [localhost:3000](http://localhost:3000/).

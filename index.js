@@ -107,7 +107,7 @@ const schema = new GraphQLSchema({
 });
 
 // set up express
-app.use('/graphql', graphqlHTTP({
+app.use('/', graphqlHTTP({
   schema: schema,
   graphiql: true,
 }));
